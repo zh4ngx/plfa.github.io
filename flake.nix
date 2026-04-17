@@ -27,7 +27,7 @@
               '(("\\.agda\\'" . agda2-mode)
                 ("\\.lagda.md\\'" . agda2-mode))
               auto-mode-alist))
-          (setq agda2-program-name "agda")
+          (setq agda2-program-name "${myAgda}/bin/agda")
 ELISP
           exec ${myEmacs}/bin/emacs -l "$PWD/.agda/plfa-init.el" "$@"
         '';
