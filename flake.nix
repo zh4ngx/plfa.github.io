@@ -13,10 +13,15 @@
         
         myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.agda2-mode ]);
         
-        # We must use agda.unwrapped to escape the Nixpkgs global wrapper
-        # which hardcodes `--library-file=/nix/store/...` before our flags.
-        myAgda = pkgs.writeShellScriptBin "agda" ''
-          exec ${pkgs.agda.unwrapped}/bin/agda --with-compiler=${pkgs.haskellPackages.ghc}/bin/ghc "$@"
+        # Nixpkgs wraps Agda with a hardcoded `--library-file` that points to a
+        # read-only empty directory if you don't use agda.withPackages. This overrides
+        # our local AGDA_DIR. We extract the raw binary and GHC path from the wrapper
+        # to build a clean version.
+        myAgda = pkgs.runCommand "agda" { buildInputs = [ pkgs.makeWrapper ]; } ''
+          mkdir -p $out/bin
+          RAW_BIN=$(grep -o '^exec "[^"]*"' ${pkgs.agda}/bin/agda | cut -d'"' -f2)
+          GHC_BIN=$(grep -o '--with-compiler=[^ ]*' ${pkgs.agda}/bin/agda | cut -d'=' -f2)
+          makeWrapper "$RAW_BIN" $out/bin/agda --add-flags "--with-compiler=$GHC_BIN"
         '';
         
         plfa-emacs = pkgs.writeShellScriptBin "plfa-emacs" ''
