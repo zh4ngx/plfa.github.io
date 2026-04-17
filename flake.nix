@@ -11,7 +11,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         
-        myEmacs = pkgs.emacsWithPackages (epkgs: [ epkgs.agda2-mode ]);
+        myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.agda2-mode ]);
         
         plfa-emacs = pkgs.writeShellScriptBin "plfa-emacs" ''
           mkdir -p "$PWD/.agda"
