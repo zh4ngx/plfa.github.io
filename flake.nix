@@ -20,7 +20,7 @@
         myAgda = pkgs.runCommand "agda" { buildInputs = [ pkgs.makeWrapper ]; } ''
           mkdir -p $out/bin
           RAW_BIN=$(grep -o '^exec "[^"]*"' ${pkgs.agda}/bin/agda | cut -d'"' -f2)
-          GHC_BIN=$(grep -o '--with-compiler=[^ ]*' ${pkgs.agda}/bin/agda | cut -d'=' -f2)
+          GHC_BIN=$(grep -o -e '--with-compiler=[^ ]*' ${pkgs.agda}/bin/agda | cut -d'=' -f2)
           makeWrapper "$RAW_BIN" $out/bin/agda --add-flags "--with-compiler=$GHC_BIN"
         '';
         
