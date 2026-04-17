@@ -13,10 +13,10 @@
         
         myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.agda2-mode ]);
         
-        # Wrap Agda to explicitly pass the local libraries file,
-        # overriding the Nixpkgs hardcoded global library wrapper.
+        # We must use agda.unwrapped to escape the Nixpkgs global wrapper
+        # which hardcodes `--library-file=/nix/store/...` before our flags.
         myAgda = pkgs.writeShellScriptBin "agda" ''
-          exec ${pkgs.agda}/bin/agda --library-file="$PWD/.agda/libraries" "$@"
+          exec ${pkgs.agda.unwrapped}/bin/agda --with-compiler=${pkgs.haskellPackages.ghc}/bin/ghc "$@"
         '';
         
         plfa-emacs = pkgs.writeShellScriptBin "plfa-emacs" ''
