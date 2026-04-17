@@ -13,6 +13,12 @@
         
         myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.agda2-mode ]);
         
+        # Wrap Agda to explicitly pass the local libraries file,
+        # overriding the Nixpkgs hardcoded global library wrapper.
+        myAgda = pkgs.writeShellScriptBin "agda" ''
+          exec ${pkgs.agda}/bin/agda --library-file="$PWD/.agda/libraries" "$@"
+        '';
+        
         plfa-emacs = pkgs.writeShellScriptBin "plfa-emacs" ''
           mkdir -p "$PWD/.agda"
           cat << 'ELISP' > "$PWD/.agda/plfa-init.el"
@@ -21,6 +27,7 @@
               '(("\\.agda\\'" . agda2-mode)
                 ("\\.lagda.md\\'" . agda2-mode))
               auto-mode-alist))
+          (setq agda2-program-name "agda")
 ELISP
           exec ${myEmacs}/bin/emacs -l "$PWD/.agda/plfa-init.el" "$@"
         '';
@@ -28,7 +35,7 @@ ELISP
       {
         devShells.default = pkgs.mkShell {
           buildInputs = [
-            pkgs.agda
+            myAgda
             myEmacs
             plfa-emacs
             pkgs.julia-mono
