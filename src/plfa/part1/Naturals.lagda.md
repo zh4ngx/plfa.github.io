@@ -79,7 +79,7 @@ Write out `7` in longhand. The suggestion below loads but is, of course, incorre
 
 ```agda
 seven : ℕ
-seven = zero
+seven = suc (suc (suc (suc (suc (suc (suc zero)))))) 
 ```
 
 Type `C-c C-l` in Emacs to instruct Agda to re-load.
@@ -448,7 +448,13 @@ other word for evidence, which we will use interchangeably, is _proof_.
 Compute `3 + 4`, writing out your reasoning as a chain of equations, using the equations for `+`.
 
 ```agda
--- Your code goes here
+_ : 3 + 4 ≡ 7
+_ =
+  begin
+    3 + 4
+   ≡⟨⟩
+    _
+   ∎  
 ```
 
 
@@ -514,7 +520,20 @@ Compute `3 * 4`, writing out your reasoning as a chain of equations, using the e
 (You do not need to step through the evaluation of `+`.)
 
 ```agda
--- Your code goes here
+_ =
+  begin
+    3 * 4
+  ≡⟨⟩    
+    4 + 2 * 4
+  ≡⟨⟩    
+    4 + ( 4 + 1 * 4)
+  ≡⟨⟩    
+    4 + (4 + 4 + 0 * 4)
+  ≡⟨⟩    
+    4 + (4 + 4 + zero)
+  ≡⟨⟩    
+    12
+  ∎ 
 ```
 
 
@@ -528,7 +547,15 @@ Define exponentiation, which is given by the following equations:
 Check that `3 ^ 4` is `81`.
 
 ```agda
--- Your code goes here
+_^_ : ℕ → ℕ → ℕ
+m ^ 0 = 1
+m ^ (suc n) = m * m ^ n
+_ =
+  begin
+    3 ^ 4
+    ≡⟨⟩    
+    81
+  ∎ 
 ```
 
 
@@ -808,6 +835,12 @@ Let's consider how to define addition interactively. (If you want to
 follow along, use a name other than `_+_` to avoid conflict with the
 definition above.)
 
+```agda
+_+p_ : ℕ → ℕ → ℕ
+zero +p n = n
+suc m +p n = suc m + n 
+```
+
 Begin by typing:
 
     _+_ : ℕ → ℕ → ℕ
@@ -973,7 +1006,124 @@ represents a positive natural, and represent zero by `⟨⟩ O`.
 Confirm that these both give the correct answer for zero through four.
 
 ```agda
--- Your code goes here
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩ I
+inc (x O) = x I
+inc (x I) = inc x O
+```
+
+```agda
+_ : inc (⟨⟩ I O I I) ≡ ⟨⟩ I I O O
+_ =
+  begin
+    inc ((((⟨⟩ I) O) I) I)
+  ≡⟨⟩
+    ⟨⟩ I I O O
+  ∎
+```
+
+```agda
+to   : ℕ → Bin
+to zero = ⟨⟩
+to (suc x) = inc (to x)
+```
+
+```agda
+_ : to zero ≡ ⟨⟩
+_ =
+  begin
+    to zero
+  ≡⟨⟩
+    ⟨⟩
+  ∎
+
+_ : to 1 ≡ ⟨⟩ I
+_ =
+  begin
+    to 1
+  ≡⟨⟩
+    ⟨⟩ I
+  ∎
+
+_ : to 2 ≡ ⟨⟩ I O
+_ =
+  begin
+    to 2
+  ≡⟨⟩
+    ⟨⟩ I O
+  ∎
+  
+_ : to 3 ≡ ⟨⟩ I I
+_ =
+  begin
+    to 3
+  ≡⟨⟩
+    ⟨⟩ I I
+  ∎
+_ : to 4 ≡ ⟨⟩ I O O
+_ =
+  begin
+    to 4
+  ≡⟨⟩
+    ⟨⟩ I O O
+  ∎
+```
+
+```agda
+from : Bin → ℕ
+from ⟨⟩ = 0
+from (x O) = 2 * (from x)
+from (x I) = 2 * (from x) + 1
+```
+
+```agda
+_ : from ⟨⟩ ≡ zero
+_ =
+  begin
+    from ⟨⟩
+  ≡⟨⟩
+    zero
+  ∎
+
+_ : from (⟨⟩ I) ≡ 1
+_ =
+  begin
+    from (⟨⟩ I)
+  ≡⟨⟩
+    1
+  ∎
+
+_ : from (⟨⟩ I O) ≡ 2
+_ =
+  begin
+    from (⟨⟩ I O)
+  ≡⟨⟩
+    2
+  ∎
+  
+_ : from (⟨⟩ I I) ≡ 3
+_ =
+  begin
+    from (⟨⟩ I I)
+  ≡⟨⟩
+    3
+  ∎
+
+_ : from (⟨⟩ I O O) ≡ 4
+_ =
+  begin
+    from (⟨⟩ I O O)
+  ≡⟨⟩
+    4
+  ∎
+
+_ : from (⟨⟩ O O I O O) ≡ 4
+_ =
+  begin
+    from (⟨⟩ O O I O O)
+  ≡⟨⟩
+    4
+  ∎ 
 ```
 
 
